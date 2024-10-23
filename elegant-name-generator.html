@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <style>
+        body {
+            font-family: 'Playfair Display', serif;
+            background: linear-gradient(135deg, #FFD700, #DAA520, #FFC125);
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sparkle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: white;
+            border-radius: 50%;
+            pointer-events: none;
+            animation: sparkle-animation 2s linear infinite;
+        }
+
+        @keyframes sparkle-animation {
+            0% {
+                transform: scale(0) rotate(0deg);
+                opacity: 0;
+            }
+            50% {
+                transform: scale(1) rotate(180deg);
+                opacity: 1;
+            }
+            100% {
+                transform: scale(0) rotate(360deg);
+                opacity: 0;
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2.5rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2),
+                        0 0 20px rgba(255, 215, 0, 0.3);
+            text-align: center;
+            max-width: 600px;
+            width: 90%;
+            position: relative;
+            backdrop-filter: blur(10px);
+        }
+
+        .ornament {
+            position: absolute;
+            width: 40px;
+            height: 40px;
+            border: 2px solid #DAA520;
+        }
+
+        .ornament-tl {
+            top: 10px;
+            left: 10px;
+            border-right: none;
+            border-bottom: none;
+        }
+
+        .ornament-tr {
+            top: 10px;
+            right: 10px;
+            border-left: none;
+            border-bottom: none;
+        }
+
+        .ornament-bl {
+            bottom: 10px;
+            left: 10px;
+            border-right: none;
+            border-top: none;
+        }
+
+        .ornament-br {
+            bottom: 10px;
+            right: 10px;
+            border-left: none;
+            border-top: none;
+        }
+
+        h1 {
+            color: #B8860B;
+            font-size: 2.5rem;
+            margin-bottom: 2rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+            position: relative;
+        }
+
+        h1::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #DAA520, transparent);
+            margin: 10px auto;
+        }
+
+        .options {
+            margin-bottom: 2rem;
+        }
+
+        select {
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            border: 2px solid #DAA520;
+            border-radius: 30px;
+            background: white;
+            color: #8B4513;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.3s ease;
+            font-family: inherit;
+        }
+
+        select:hover {
+            border-color: #B8860B;
+            box-shadow: 0 0 10px rgba(218, 165, 32, 0.3);
+        }
+
+        button {
+            background: linear-gradient(135deg, #FFD700, #DAA520);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-weight: bold;
+            margin: 1rem 0;
+            box-shadow: 0 5px 15px rgba(218, 165, 32, 0.3);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 7px 20px rgba(218, 165, 32, 0.4);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        #generatedName {
+            font-size: 2rem;
+            color: #8B4513;
+            margin: 2rem 0;
+            min-height: 2.5rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease;
+        }
+
+        #generatedName.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .history {
+            margin-top: 2rem;
+            padding-top: 1rem;
+            border-top: 2px solid rgba(218, 165, 32, 0.2);
+        }
+
+        .history-title {
+            color: #B8860B;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        .history-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            justify-content: center;
+        }
+
+        .history-item {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 15px;
+            color: #8B4513;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="ornament ornament-tl"></div>
+        <div class="ornament ornament-tr"></div>
+        <div class="ornament ornament-bl"></div>
+        <div class="ornament ornament-br"></div>
+        
+        <h1>Elegant Name Generator</h1>
+        
+        <div class="options">
+            <select id="nameType">
+                <option value="royal">Royal Names</option>
+                <option value="noble">Noble Names</option>
+                <option value="elegant">Elegant Names</option>
+                <option value="classic">Classic Names</option>
+            </select>
+        </div>
+
+        <button onclick="generateName()">Generate Name</button>
+        <div id="generatedName"></div>
+
+        <div class="history">
+            <div class="history-title">Recent Names</div>
+            <div class="history-list" id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        // Name data
+        const firstNames = {
+            royal: ['Alexander', 'Victoria', 'Elizabeth', 'William', 'Henry', 'Catherine', 'Edward', 'Margaret'],
+            noble: ['Maximilian', 'Adelaide', 'Augustus', 'Eleanor', 'Theodore', 'Beatrice', 'Frederick', 'Genevieve'],
+            elegant: ['Sebastian', 'Isabella', 'Nathaniel', 'Arabella', 'Dominic', 'Valentina', 'Gabriel', 'Evangeline'],
+            classic: ['James', 'Charlotte', 'Benjamin', 'Sophia', 'Alexander', 'Elizabeth', 'William', 'Katherine']
+        };
+
+        const lastNames = {
+            royal: ['Windsor', 'Habsburg', 'Bourbon', 'Stuart', 'Tudor', 'Romanov', 'Medici', 'Valois'],
+            noble: ['Blackwood', 'Montgomery', 'Sinclair', 'Richmond', 'Sterling', 'Montague', 'Beaumont', 'Rothschild'],
+            elegant: ['Hawthorne', 'Sinclair', 'Beaumont', 'Montenegro', 'Cambridge', 'Wellington', 'Kensington', 'Remington'],
+            classic: ['Hamilton', 'Winchester', 'Montgomery', 'Blackwood', 'Fitzgerald', 'Huntington', 'Westbrook', 'Kensington']
+        };
+
+        // Keep track of generated names
+        const nameHistory = [];
+        const maxHistory = 5;
+
+        // Create sparkles
+        function createSparkles() {
+            setInterval(() => {
+                const sparkle = document.createElement('div');
+                sparkle.className = 'sparkle';
+                sparkle.style.left = Math.random() * 100 + 'vw';
+                sparkle.style.top = Math.random() * 100 + 'vh';
+                document.body.appendChild(sparkle);
+                
+                setTimeout(() => {
+                    sparkle.remove();
+                }, 2000);
+            }, 200);
+        }
+
+        function getRandomElement(array) {
+            return array[Math.floor(Math.random() * array.length)];
+        }
+
+        function updateHistory(name) {
+            nameHistory.unshift(name);
+            if (nameHistory.length > maxHistory) {
+                nameHistory.pop();
+            }
+
+            const historyList = document.getElementById('historyList');
+            historyList.innerHTML = nameHistory.map(name => 
+                `<div class="history-item">${name}</div>`
+            ).join('');
+        }
+
+        function generateName() {
+            const nameType = document.getElementById('nameType').value;
+            const firstName = getRandomElement(firstNames[nameType]);
+            const lastName = getRandomElement(lastNames[nameType]);
+            const fullName = `${firstName} ${lastName}`;
+
+            const nameElement = document.getElementById('generatedName');
+            nameElement.classList.remove('show');
+            
+            setTimeout(() => {
+                nameElement.textContent = fullName;
+                nameElement.classList.add('show');
+                updateHistory(fullName);
+            }, 100);
+        }
+
+        // Initialize sparkles on load
+        createSparkles();
+    </script>
+</body>
+</html>
